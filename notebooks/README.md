@@ -1,4 +1,4 @@
- Notebooks
+Notebooks
 This directory contains Jupyter notebooks for data profiling, cleaning, and EDA for the Solar Data Challenge.
 
 benin_eda.ipynb: Profiling and analysis for benin-malanville.csv.
