@@ -1,3 +1,7 @@
+"""
+Utility functions for the Solar Challenge project.
+"""
+
 from typing import Optional, Union, Dict
 import pandas as pd
 import matplotlib.pyplot as plt
