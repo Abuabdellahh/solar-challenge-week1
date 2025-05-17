@@ -1,11 +1,12 @@
 {
     "python.pythonPath": "venv/bin/python",
-    "python.linting.enabled": true,
-    "python.linting.pylintEnabled": true,
+    "editor.formatOnSave": true,
     "files.exclude": {
         "**/__pycache__": true,
-        "**/*.pyc": true,
+        "**/.pytest_cache": true,
         "venv/": true,
         "data/": true
-    }
+    },
+    "python.linting.enabled": true,
+    "python.linting.pylintEnabled": true
 }
