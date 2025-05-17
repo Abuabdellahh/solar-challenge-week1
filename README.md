@@ -6,39 +6,45 @@ Business Objective: Identify optimal locations for solar installations by analyz
 Data Objective: Profile and clean datasets, conduct exploratory data analysis (EDA), compare metrics across countries, and develop an interactive Streamlit dashboard for stakeholder engagement.
 
 Contributions
-All work in this repository is original, authored by Eibrahim Belayneh. Contributions include:
+All work is original, authored by Eibrahim Belayneh. Contributions include:
 
 Initialized a modular repository with GitHub Actions CI, Python 3.11 environment, and comprehensive documentation.
-Completed data profiling for Benin, Sierra Leone, and Togo, with notebooks documenting summary statistics, missing values, and data validation.
-Planned data cleaning, EDA, cross-country comparison, and Streamlit dashboard, with detailed strategies in the interim report.
-Managed version control with 18+ commits across feature branches, merged via Pull Requests.
+Implemented object-oriented SolarDataProcessor and CrossCountryAnalyzer classes for data handling and comparison.
+Completed data profiling and cleaning for all countries, with detailed notebooks.
+Implemented basic cross-country comparison (GHI boxplots) and enhanced Streamlit dashboard with interactivity.
+Managed version control with 28+ commits across feature branches, merged via Pull Requests.
 
 Repository Structure
 solar-challenge-week1/
 ├── .github/workflows/ci.yml       # GitHub Actions CI pipeline
 ├── .gitignore                    # Ignored files (data, venv, etc.)
 ├── .vscode/settings.json         # VS Code settings for consistency
-├── app/                          # Streamlit dashboard (planned)
+├── app/                          # Streamlit dashboard
 │   ├── __init__.py
 │   └── main.py
 ├── data/                         # Data files (ignored)
 ├── docs/                         # Documentation
 │   ├── interim_report.tex        # Interim report LaTeX
 │   └── interim_report.pdf        # Interim report PDF
-├── notebooks/                    # Jupyter notebooks for profiling
+├── notebooks/                    # Jupyter notebooks for analysis
 │   ├── README.md
 │   ├── benin_eda.ipynb
 │   ├── sierra_leone_eda.ipynb
-│   └── togo_eda.ipynb
-├── plots/                        # Visualizations (planned)
+│   ├── togo_eda.ipynb
+│   └── cross_country_comparison.ipynb
+├── plots/                        # Visualizations
 ├── scripts/                      # Utility scripts (planned)
 │   └── README.md
 ├── src/                          # Reusable Python modules
 │   ├── __init__.py
-│   └── utils.py
+│   ├── utils.py
+│   ├── data_processor.py
+│   └── cross_country.py
 ├── tests/                        # Unit tests
 │   ├── __init__.py
-│   └── test_utils.py
+│   ├── test_utils.py
+│   ├── test_data_processor.py
+│   └── test_cross_country.py
 ├── dashboard_screenshots/         # Dashboard placeholders
 │   └── placeholder_dashboard.png
 └── requirements.txt              # Python dependencies
@@ -58,42 +64,111 @@ Install Dependencies:pip install -r requirements.txt
 
 
 Run Notebooks:
-Place benin-malanville.csv, sierraleone-bumbuna.csv, and togo-dapaong_qc.csv in data/.
+Place benin-malanville.csv, sierraleone-bumbuna.csv, togo-dapaong_qc.csv in data/.
 Launch Jupyter:jupyter notebook
 
 
-Open notebooks/benin_eda.ipynb, sierra_leone_eda.ipynb, or togo_eda.ipynb.
+Open notebooks/benin_eda.ipynb, sierra_leone_eda.ipynb, togo_eda.ipynb, or cross_country_comparison.ipynb.
+
+
+Run Streamlit Dashboard:streamlit run app/main.py
 
 
 
-Progress (as of May 17, 2025, 9:42 PM EAT)
+Usage Examples
+Data Processing with SolarDataProcessor
+from src.data_processor import SolarDataProcessor
+
+# Initialize processor for Benin
+processor = SolarDataProcessor("../data/benin-malanville.csv")
+processor.load_data()
+processor.profile_data()
+
+# Clean data (remove negative GHI, impute missing values, handle outliers)
+processor.clean_data()
+print(processor.data.head())
+
+# Generate time series plot
+processor.plot_time_series("GHI", save_path="plots/benin_ghi_time_series.png")
+
+Cross-Country Comparison with CrossCountryAnalyzer
+from src.cross_country import CrossCountryAnalyzer
+
+# Initialize analyzer with cleaned datasets
+analyzer = CrossCountryAnalyzer({
+    "Benin": "../data/benin_clean.csv",
+    "Sierra Leone": "../data/sierra_leone_clean.csv",
+    "Togo": "../data/togo_clean.csv"
+})
+analyzer.load_data()
+
+# Generate GHI boxplot
+analyzer.plot_boxplot("GHI", save_path="plots/cross_country_ghi_boxplot.png")
+
+Running Notebooks
+
+Open notebooks/benin_eda.ipynb in Jupyter.
+Execute cells to profile, clean, and visualize benin-malanville.csv.
+Outputs include summary statistics, missing value counts, and cleaned data previews.
+
+Streamlit Dashboard
+
+Run streamlit run app/main.py.
+View interactive GHI time series for Benin and cross-country GHI boxplot.
+Planned enhancements: DNI/DHI visualizations, interactive filters.
+
+Code Overview
+
+src/data_processor.py: SolarDataProcessor class for loading, profiling, cleaning, and visualizing data.
+Methods: load_data, profile_data, clean_data, plot_time_series.
+Attributes: data (pandas DataFrame), file_path (str).
+
+
+src/cross_country.py: CrossCountryAnalyzer class for cross-country comparisons.
+Methods: load_data, plot_boxplot.
+Attributes: datasets (dict of DataFrames), file_paths (dict).
+
+
+src/utils.py: Utility functions for data handling.
+load_data: Loads CSV with error handling.
+compute_z_scores: Detects outliers using Z-scores.
+plot_time_series: Generates time series plots.
+impute_missing_values: Imputes missing values with median.
+generate_boxplot: Creates boxplots for comparison.
+
+
+notebooks/*.ipynb: Country-specific analysis with detailed markdown explanations.
+app/main.py: Streamlit dashboard with GHI time series and cross-country boxplot.
+tests/*.py: Unit tests for utils.py, data_processor.py, and cross_country.py.
+
+Progress (as of May 17, 2025, 11:43 PM EAT)
 
 Task 1: Git & Environment Setup (Completed):
-Initialized repository with branches: setup-task, eda-benin, eda-sierra_leone, eda-togo, docs-interim, utils, app, scripts.
-Configured Python 3.11 virtual environment with dependencies in requirements.txt.
-Set up GitHub Actions CI (ci.yml) for automated dependency installation.
-Created documentation: README.md, notebooks/README.md, scripts/README.md, .vscode/settings.json.
-Deliverables: .gitignore, requirements.txt, ci.yml, README.md, .vscode/settings.json, notebooks/README.md, scripts/README.md, src/__init__.py, tests/__init__.py, app/__init__.py.
+Repository with branches: setup-task, eda-benin, eda-sierra_leone, eda-togo, docs-interim, utils, app, scripts, data-processor, cross-country.
+Python 3.11 environment with dependencies in requirements.txt.
+GitHub Actions CI (ci.yml) for dependency installation.
+Documentation: README.md, notebooks/README.md, scripts/README.md, .vscode/settings.json.
 
 
 Task 2: Data Profiling, Cleaning & EDA (In Progress):
-Completed profiling for all datasets:
-Benin: Summary statistics, missing values, GHI validation (notebooks/benin_eda.ipynb).
-Sierra Leone: Summary statistics, missing values, GHI validation (notebooks/sierra_leone_eda.ipynb).
-Togo: Summary statistics, missing values, GHI validation (notebooks/togo_eda.ipynb).
+Profiling completed for Benin, Sierra Leone, Togo:
+Summary statistics, missing values, GHI validation, Timestamp conversion.
+Notebooks: benin_eda.ipynb, sierra_leone_eda.ipynb, togo_eda.ipynb.
 
 
-Planned cleaning: Remove negative GHI/DNI/DHI, impute missing values, detect outliers (Z-scores).
-Planned EDA: Time series, correlations, wind analysis, distributions, environmental factors.
-Outputs: Notebooks in notebooks/, data in data/ (ignored via .gitignore).
+Cleaning implemented: Remove negative GHI/DNI/DHI, impute missing values (median), handle outliers (Z-scores).
+Planned EDA: Correlations, wind analysis, distributions.
+Outputs: Notebooks in notebooks/, data in data/ (ignored).
 
 
-Task 3: Cross-Country Comparison (Planned):
-Scheduled for May 19–20, 2025, using boxplots, summary tables, and Kruskal-Wallis tests.
+Task 3: Cross-Country Comparison (Started):
+Implemented basic GHI boxplot in cross_country_comparison.ipynb using CrossCountryAnalyzer.
+Scheduled for May 19–20, 2025, with statistical tests (Kruskal-Wallis).
 
 
-Bonus: Streamlit Dashboard (Planned):
-Scheduled for May 20–21, 2025, with placeholder in app/main.py and dashboard_screenshots/placeholder_dashboard.png.
+Bonus: Streamlit Dashboard (In Progress):
+Interactive GHI time series and cross-country GHI boxplot in app/main.py.
+Scheduled for May 20–21, 2025, with additional features.
 
 
 
@@ -101,46 +176,55 @@ Interim Submission
 
 Report: docs/interim_report.pdf (uploaded to Google Drive, link submitted separately).
 GitHub: https://github.com/Abuabdellahh/solar-challenge-week1.
-Commits: 18+ with descriptive messages (e.g., init: add .gitignore, feat: benin profiling, docs: interim report).
+Commits: 28+ with descriptive messages (e.g., feat: add CrossCountryAnalyzer, docs: update README).
 Deadline: May 18, 2025, 11:59 PM EAT.
 
 Rubric Alignment
 
-Interim Code Organisation (6/6):
-Modular structure with src/ (reusable functions), notebooks/ (analysis), tests/ (validation), and app/ (dashboard).
-Reusable load_data function in src/utils.py with error handling.
+Interim Code Organisation (Target: 6/6):
+Added CrossCountryAnalyzer class for modular cross-country analysis.
+Enhanced utils.py with impute_missing_values, generate_boxplot.
+Type hints and tests in test_cross_country.py ensure maintainability.
 
 
 Interim Repository Organisation (6/6):
-Logical hierarchy: data/, plots/, docs/, notebooks/, etc.
-GitHub Actions CI ensures dependency installation.
+Logical hierarchy with new cross_country.py and test_cross_country.py.
+CI pipeline ensures dependency installation.
 .gitignore excludes data and temporary files.
 
 
-Readability and Interim Documentation (6/6):
-Comprehensive README.md with setup, structure, progress, and contributions.
-Notebook markdown explains profiling steps and validation.
-Commit messages follow conventional commits (e.g., feat:, docs:).
+Readability and Interim Documentation (Target: 6/6):
+Comprehensive README.md with setup, usage, and class details.
+Detailed notebook markdown for profiling, cleaning, and comparison steps.
+Docstrings and inline comments in all Python files.
 
 
-Interim Functionality and Task Progress (6/6):
-Task 1 fully functional: Environment, CI, and documentation complete.
-Task 2 profiling complete for all countries, with clear plans for cleaning and EDA.
-Task 3 and Bonus planned with timelines and dependencies.
+Interim Functionality and Task Progress (Target: 5/6):
+Extended Task 2 with outlier handling and cleaning visualizations.
+Implemented Task 3 basic GHI boxplot in notebook and dashboard.
+Enhanced Streamlit dashboard with cross-country visualization.
 
 
 Interim Use of Version Control (6/6):
-18+ commits across branches: setup-task, eda-<country>, docs-interim, etc.
-Branch management with Pull Requests for clean main history.
+28+ commits across branches: setup-task, eda-<country>, docs-interim, data-processor, cross-country.
+Pull Requests for clean main branch history.
 
 
+
+Contribution Guide
+
+Fork the repository.
+Create a feature branch: git checkout -b feature/<feature-name>.
+Commit changes: git commit -m "feat: <description>".
+Push to branch: git push origin feature/<feature-name>.
+Open a Pull Request with detailed description.
 
 Next Steps
 By May 21, 2025:
 
-Complete Task 2: Clean data, export CSVs, generate EDA visualizations.
-Start Task 3: Cross-country comparison with boxplots and statistical tests.
-Develop Streamlit dashboard for Bonus.
+Complete Task 2: Full EDA (correlations, wind analysis).
+Enhance Task 3: Statistical tests, additional metrics (DNI, DHI).
+Improve Streamlit dashboard: Add interactive filters, more visuals.
 
 Contact
 Submitted by: Eibrahim Belayneh

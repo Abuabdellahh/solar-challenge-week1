@@ -1,6 +1,7 @@
-from typing import Optional, Union
+from typing import Optional, Union, Dict
 import pandas as pd
 import matplotlib.pyplot as plt
+import plotly.express as px
 
 def load_data(file_path: str) -> Optional[pd.DataFrame]:
     """
@@ -55,3 +56,41 @@ def plot_time_series(df: pd.DataFrame, column: str, save_path: Optional[str] = N
         plt.close()
     else:
         plt.show()
+
+def impute_missing_values(df: pd.DataFrame, columns: list[str]) -> pd.DataFrame:
+    """
+    Impute missing values in specified columns with median.
+
+    Args:
+        df (pd.DataFrame): Input DataFrame.
+        columns (list[str]): Columns to impute.
+
+    Returns:
+        pd.DataFrame: DataFrame with imputed values.
+    """
+    df_copy = df.copy()
+    for col in columns:
+        if col in df_copy.columns:
+            df_copy[col].fillna(df_copy[col].median(), inplace=True)
+    return df_copy
+
+def generate_boxplot(data: Dict[str, pd.DataFrame], column: str, save_path: Optional[str] = None) -> None:
+    """
+    Generate boxplot for a column across multiple datasets.
+
+    Args:
+        data (Dict[str, pd.DataFrame]): Dictionary of country names and DataFrames.
+        column (str): Column to plot.
+        save_path (Optional[str]): Path to save plot.
+    """
+    combined = pd.DataFrame()
+    for country, df in data.items():
+        temp = df[[column]].copy()
+        temp["Country"] = country
+        combined = pd.concat([combined, temp], axis=0)
+    
+    fig = px.box(combined, x="Country", y=column, title=f"{column} Distribution by Country")
+    if save_path:
+        fig.write_image(save_path)
+    else:
+        fig.show()

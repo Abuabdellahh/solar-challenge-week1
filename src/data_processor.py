@@ -1,6 +1,6 @@
 from typing import Optional, List
 import pandas as pd
-from src.utils import load_data, compute_z_scores, plot_time_series
+from src.utils import load_data, compute_z_scores, plot_time_series, impute_missing_values
 
 class SolarDataProcessor:
     """
@@ -22,15 +22,19 @@ class SolarDataProcessor:
 
     def load_data(self) -> bool:
         """
-        Load data from CSV file.
+        Load data from CSV file and convert Timestamp to datetime.
 
         Returns:
             bool: True if successful, False otherwise.
         """
         self.data = load_data(self.file_path)
         if self.data is not None:
-            self.data["Timestamp"] = pd.to_datetime(self.data["Timestamp"])
-            return True
+            try:
+                self.data["Timestamp"] = pd.to_datetime(self.data["Timestamp"])
+                return True
+            except Exception as e:
+                print(f"Error converting Timestamp: {e}")
+                self.data = None
         return False
 
     def profile_data(self) -> dict:
@@ -57,7 +61,7 @@ class SolarDataProcessor:
 
     def clean_data(self) -> None:
         """
-        Clean data by removing negative GHI/DNI/DHI and imputing missing values with median.
+        Clean data by removing negative GHI/DNI/DHI, imputing missing values, and handling outliers.
         """
         if self.data is None:
             return
@@ -68,11 +72,19 @@ class SolarDataProcessor:
         
         # Impute missing values with median for numeric columns
         numeric_cols = self.data.select_dtypes(include="number").columns
-        for col in numeric_cols:
-            self.data[col].fillna(self.data[col].median(), inplace=True)
+        self.data = impute_missing_values(self.data, numeric_cols)
         
-        # Drop rows with missing Timestamp
+        # Handle outliers using Z-scores (|Z| > 3)
+        z_scores = compute_z_scores(self.data, ["GHI", "DNI", "DHI"])
+        self.data = self.data[
+            (z_scores["GHI_z"].abs() <= 3) &
+            (z_scores["DNI_z"].abs() <= 3) &
+            (z_scores["DHI_z"].abs() <= 3)
+        ]
+        
+        # Drop rows with missing or invalid Timestamp
         self.data.dropna(subset=["Timestamp"], inplace=True)
+        self.data = self.data[self.data["Timestamp"].notna()]
 
     def plot_time_series(self, column: str, save_path: Optional[str] = None) -> None:
         """
