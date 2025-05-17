@@ -20,5 +20,8 @@ class TestUtils(unittest.TestCase):
         self.assertFalse(imputed["DNI"].isna().any())
         self.assertEqual(imputed["GHI"][1], 200)  # Median of [100, 300]
 
+def test_placeholder():
+    assert True
+
 if __name__ == "__main__":
     unittest.main()
